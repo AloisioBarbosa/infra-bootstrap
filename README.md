@@ -1,0 +1,3 @@
+# infra-bootstrap
+
+Platform component.
