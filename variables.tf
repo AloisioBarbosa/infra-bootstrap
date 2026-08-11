@@ -37,3 +37,23 @@ variable "github_organization" {
   description = "Organização GitHub autorizada a assumir as roles de CI via OIDC."
   default     = "AloisioBarbosa"
 }
+
+variable "github_owner_id" {
+  type        = string
+  description = "ID imutável do owner GitHub usado no subject OIDC."
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.github_owner_id))
+    error_message = "github_owner_id deve conter apenas dígitos."
+  }
+}
+
+variable "infra_network_repository_id" {
+  type        = string
+  description = "ID imutável do repositório infra-network usado no subject OIDC."
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.infra_network_repository_id))
+    error_message = "infra_network_repository_id deve conter apenas dígitos."
+  }
+}

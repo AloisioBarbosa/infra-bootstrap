@@ -44,6 +44,8 @@ Não pertencem a este repositório:
 - O backend usa locking nativo do S3 por arquivo `.tflock`.
 - `prevent_destroy` protege o bucket de state.
 - O prefixo SSM autorizado para o `infra-network` é `/infra-network/vpc/*`.
+- A trust policy do `infra-network` usa o subject OIDC imutável do GitHub e
+  autoriza somente o environment `production`.
 - A role OIDC não altera automaticamente o workflow consumidor; o cutover
   ocorre depois do apply do bootstrap.
 - Recursos preexistentes foram importados para o state local antes da adoção do

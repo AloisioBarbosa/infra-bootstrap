@@ -24,9 +24,11 @@ data "aws_iam_policy_document" "github_actions_infra_network_trust" {
     }
 
     condition {
-      test     = "StringLike"
+      test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_organization}/infra-network:*"]
+      values = [
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-network@${var.infra_network_repository_id}:environment:production",
+      ]
     }
   }
 }
