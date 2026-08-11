@@ -30,7 +30,7 @@ Não pertencem a este repositório:
 | `variables.tf` | região, ambiente, bucket e organização GitHub |
 | `data.tf` | identidade AWS e certificado do endpoint OIDC |
 | `terraform_state.tf` | bucket, versionamento, criptografia e bloqueio público |
-| `github_oidc.tf` | provider OIDC e role/policy do `infra-network` |
+| `github_oidc.tf` | provider OIDC e `TerraformInfraNetworkPolicy` da role de rede |
 | `github_actions_bootstrap.tf` | role/policy OIDC do pipeline do bootstrap |
 | `api_gateway_account.tf` | logging global do API Gateway na conta |
 | `outputs.tf` | bucket e ARNs publicados |
@@ -45,8 +45,13 @@ Não pertencem a este repositório:
   `bootstrap/dev/terraform.tfstate`.
 - `prevent_destroy` protege o bucket de state.
 - O prefixo SSM autorizado para o `infra-network` é `/infra-network/vpc/*`.
-- A trust policy do `infra-network` usa o subject OIDC imutável do GitHub e
-  autoriza somente o environment `production`.
+- A role do `infra-network` gerencia apenas EC2 de rede, o contrato SSM e seu
+  prefixo de state; ela não substitui a role global do `infra-bootstrap`.
+- `ssm:DescribeParameters` usa `Resource = "*"`; escrita e leitura de valores
+  permanecem restritas a `/infra-network/vpc/*`.
+- A trust policy do `infra-network` usa subjects OIDC imutáveis do GitHub e
+  autoriza os environments `plan` e `production`, pois ambos assumem a mesma
+  role no workflow atual.
 - A role OIDC não altera automaticamente o workflow consumidor; o cutover
   ocorre depois do apply do bootstrap.
 - Recursos preexistentes foram importados para o state local antes da adoção do

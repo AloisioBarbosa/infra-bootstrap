@@ -27,6 +27,7 @@ data "aws_iam_policy_document" "github_actions_infra_network_trust" {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-network@${var.infra_network_repository_id}:environment:plan",
         "repo:${var.github_organization}@${var.github_owner_id}/infra-network@${var.infra_network_repository_id}:environment:production",
       ]
     }
@@ -66,6 +67,7 @@ data "aws_iam_policy_document" "github_actions_infra_network" {
       "ec2:DescribeAvailabilityZones",
       "ec2:DescribeInternetGateways",
       "ec2:DescribeNatGateways",
+      "ec2:DescribeNetworkInterfaces",
       "ec2:DescribeRouteTables",
       "ec2:DescribeSubnets",
       "ec2:DescribeTags",
@@ -76,8 +78,16 @@ data "aws_iam_policy_document" "github_actions_infra_network" {
       "ec2:ModifySubnetAttribute",
       "ec2:ModifyVpcAttribute",
       "ec2:ReleaseAddress",
+      "ec2:ReplaceRoute",
       "ec2:ReplaceRouteTableAssociation",
     ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "DescribeNetworkContractParameters"
+    effect    = "Allow"
+    actions   = ["ssm:DescribeParameters"]
     resources = ["*"]
   }
 
