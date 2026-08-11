@@ -47,6 +47,22 @@ Outputs publicados:
 A chave do state deste produto é `bootstrap/dev/terraform.tfstate`. O contrato
 SSM autorizado para a rede é `/infra-network/vpc/*`.
 
+As roles possuem responsabilidades diferentes:
+
+- `GitHubActionsOIDCInfraBootstrapRole` gerencia a fundação global: backend,
+  IAM/OIDC e configuração da conta do API Gateway;
+- `GitHubActionsOIDCInfraNetworkRole` gerencia somente recursos EC2 de rede,
+  parâmetros sob `/infra-network/vpc/*` e objetos do state sob `vpc/dev/*`; o
+  workflow atual a assume nos environments `plan` e `production`.
+
+A policy inline da role de rede é declarada em `github_oidc.tf` com o nome
+`TerraformInfraNetworkPolicy`. Ajustes manuais no console devem ser trazidos de
+volta ao Terraform para evitar drift.
+
+Como evolução de least privilege, o job de plan deve receber uma role separada
+e read-only. Até essa separação, qualquer alteração no environment `plan` ou no
+workflow exige a mesma revisão de segurança aplicada ao environment de produção.
+
 ## Configuração
 
 Copie o exemplo apenas para uso local:
