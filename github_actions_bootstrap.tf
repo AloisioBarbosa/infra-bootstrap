@@ -17,7 +17,9 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap_trust" {
     condition {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_organization}/infra-bootstrap:environment:production"]
+      values = [
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-bootstrap@${var.infra_bootstrap_repository_id}:environment:production",
+      ]
     }
   }
 }
