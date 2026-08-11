@@ -112,6 +112,7 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
       "s3:PutBucketPublicAccessBlock",
       "s3:PutBucketTagging",
       "s3:PutBucketVersioning",
+      "s3:GetBucketObjectLockConfiguration",
       "s3:PutEncryptionConfiguration",
     ]
     resources = [aws_s3_bucket.terraform_state.arn]
