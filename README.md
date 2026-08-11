@@ -1,112 +1,135 @@
 # infra-bootstrap
 
-Produto de infraestrutura responsável pela fundação compartilhada da conta AWS.
-Provisiona recursos globais e pré-requisitos consumidos pelos demais produtos da
-plataforma, sem assumir ownership de VPC, cluster, workloads ou observabilidade.
+Produto responsável pela fundação compartilhada da conta AWS. Provisiona o
+backend Terraform, federação OIDC, roles de CI e configurações globais sem
+assumir ownership de rede, cluster, workloads ou observabilidade.
+
+## Estado atual
+
+O bootstrap está implantado com sucesso. Os recursos preexistentes foram
+adotados pelo Terraform, e o state está em
+`s3://orange-ks8-logs/bootstrap/dev/terraform.tfstate`, com versionamento e
+locking nativo do S3. O deploy automatizado usa credenciais temporárias via
+GitHub Actions OIDC.
 
 ## Escopo
 
 Inclui:
 
-- bucket S3 compartilhado para states Terraform, com versionamento, criptografia
-  e bloqueio de acesso público;
+- bucket S3 compartilhado para states Terraform;
 - provider OIDC do GitHub Actions;
-- role e policy de CI do próprio `infra-bootstrap`, restritas ao environment
-  protegido `production`;
-- role e policy de CI do `infra-network`, limitadas ao backend, recursos de rede
-  e ao prefixo SSM publicado pelo produto;
-- role de CloudWatch Logs e configuração global da conta do API Gateway.
+- role e policy de CI do `infra-bootstrap`;
+- role e policy de CI do `infra-network`;
+- role de CloudWatch Logs e configuração global do API Gateway.
 
-Não inclui VPC, sub-redes, gateways, rotas, endpoints, DNS de infraestrutura,
-Amazon EKS ou serviços compartilhados do Kubernetes.
+Não inclui VPC, sub-redes, gateways, rotas, endpoints, DNS, Amazon EKS,
+serviços Kubernetes, aplicações ou observabilidade.
 
-## Dependências e consumidores
+## Arquitetura e contratos
 
 ```mermaid
 flowchart LR
-  B["infra-bootstrap\nstate, IAM e governança"] --> N["infra-network\nVPC e conectividade"]
-  N -->|"parâmetros SSM"| C["infra-cluster\nEKS e nodes"]
+  GH["GitHub Actions"] -->|"OIDC production"| B["infra-bootstrap"]
+  B --> S3["S3 state e lockfile"]
+  B --> IAM["Roles OIDC por produto"]
+  B --> APIGW["Logging global API Gateway"]
+  IAM --> N["infra-network"]
+  N -->|"parâmetros SSM"| C["infra-cluster"]
 ```
 
-O `infra-network` consome o bucket informado por `terraform_state_bucket`. A
-role publicada em `infra_network_github_actions_role_arn` será usada na migração
-do pipeline de access keys estáticas para OIDC.
+Outputs publicados:
 
-## Bootstrap inicial e migração do state
+- `terraform_state_bucket`;
+- `infra_bootstrap_github_actions_role_arn`;
+- `infra_network_github_actions_role_arn`;
+- `api_gateway_cloudwatch_role_arn`.
 
-O bootstrap não pode usar, na primeira execução, o backend que ele próprio ainda
-vai criar. A implantação inicial usa state local:
+A chave do state deste produto é `bootstrap/dev/terraform.tfstate`. O contrato
+SSM autorizado para a rede é `/infra-network/vpc/*`.
+
+## Configuração
+
+Copie o exemplo apenas para uso local:
 
 ```bash
 cp terraform.tfvars.example terraform.tfvars
-terraform init
-terraform fmt -check -recursive
-terraform validate
-terraform plan -out=tfplan
-terraform apply tfplan
 ```
 
-O repositório usa configuração parcial do backend S3 em `backend.tf`. Depois que
-o bucket existir, migre o state local antes de gerar novos planos:
+O GitHub Actions exige estas repository variables:
+
+- `AWS_REGION`;
+- `TF_STATE_BUCKET`;
+- `AWS_ROLE_ARN`, apontando para a role exclusiva do bootstrap;
+- `GH_OWNER_ID`;
+- `INFRA_BOOTSTRAP_REPOSITORY_ID`;
+- `INFRA_NETWORK_REPOSITORY_ID`.
+
+O environment `production` faz parte do subject OIDC. Mantenha nele as
+proteções e aprovações exigidas para alterações na conta AWS.
+
+## Validação local
 
 ```bash
-cp terraform.tfstate terraform.tfstate.pre-migration.backup
-terraform init -migrate-state \
-  -backend-config="bucket=orange-ks8-logs" \
-  -backend-config="key=bootstrap/dev/terraform.tfstate" \
-  -backend-config="region=us-east-1" \
-  -backend-config="use_lockfile=true"
-terraform state list
+terraform fmt -check -recursive
+terraform init -input=false
+terraform validate
+terraform plan
 ```
 
-Não remova o backup local até confirmar que todos os recursos aparecem no state
-remoto. O lockfile do backend é armazenado ao lado do state no S3. Depois da
-migração, execute um apply local usando o backend remoto para criar a role OIDC
-do próprio bootstrap.
+Resuma o plan na Pull Request sem commitar o plano binário. Não commite states,
+credenciais, tokens ou `terraform.tfvars`.
 
-## Deploy pelo GitHub Actions
+## Deploy
 
-O workflow valida pull requests sem acessar a AWS. Em pushes para `main`, o job
-`deploy` assume a role OIDC do bootstrap, gera um plano e o aplica no environment
-`production`.
+Pull Requests executam formatação e validação sem credenciais AWS. Após merge
+em `main`, o job `deploy` assume `GitHubActionsOIDCInfraBootstrapRole`, adquire
+o lock remoto, gera um plano salvo e aplica exatamente esse plano no
+environment `production`.
 
-Antes do primeiro deploy automatizado:
+O bootstrap inicial já foi concluído. Em uma reconstrução de conta, a ordem é:
 
-1. Migre e valide o state remoto conforme a seção anterior.
-2. Aplique localmente a criação da role `GitHubActionsOIDCInfraBootstrapRole`.
-3. Crie o environment `production` e configure proteção/aprovação obrigatória.
-4. Configure estas Actions variables no environment:
-   - `AWS_REGION`: `us-east-1`;
-   - `TF_STATE_BUCKET`: `orange-ks8-logs`;
-   - `AWS_ROLE_ARN`: valor do output
-     `infra_bootstrap_github_actions_role_arn`.
+1. criar a fundação usando state local;
+2. importar recursos preexistentes, se houver;
+3. fazer backup do state local;
+4. migrar para `bootstrap/dev/terraform.tfstate`;
+5. validar o inventário remoto;
+6. criar a role OIDC dedicada;
+7. habilitar o deploy automatizado.
 
-O workflow utiliza credenciais temporárias via OIDC. Não configure access keys,
-tokens pessoais ou credenciais AWS permanentes como secrets do repositório.
-
-## Ordem de adoção
-
-1. Aplicar localmente a fundação inicial do `infra-bootstrap`.
-2. Migrar e validar o state do bootstrap no bucket criado.
-3. Aplicar localmente a role OIDC do próprio bootstrap usando o state remoto.
-4. Configurar o environment `production` e testar o deploy automatizado.
-5. Configurar nos consumidores o bucket, a chave e a região.
-6. Configurar `AWS_ROLE_ARN` com o output da role OIDC de cada consumidor.
-7. Migrar os workflows para `role-to-assume` e remover access keys estáticas.
-8. Aplicar o `infra-network`.
-
-Recursos preexistentes adotados pelo bootstrap devem ser importados antes do
-primeiro plano. Os IDs e o procedimento executado ficam registrados no changelog.
+Não execute `apply`, `destroy`, `import`, `state mv` ou migração de backend sem
+plan, backup e aprovação explícita.
 
 ## Segurança e operação
 
-- O bucket possui `prevent_destroy`; sua remoção exige mudança explícita.
-- A role do `infra-network` confia somente no repositório configurado.
-- A role do bootstrap confia somente no environment `production` do próprio
-  repositório.
-- Alterações em IAM, backend ou configurações globais exigem revisão de segurança
-  e evidência do Terraform plan.
-- `terraform.tfvars` e qualquer state local não devem ser commitados.
+- o bucket possui `prevent_destroy`, criptografia, bloqueio público e
+  versionamento;
+- as trust policies usam subjects imutáveis com IDs de owner e repositório;
+- a role do bootstrap confia somente no environment `production` deste repo;
+- a role de rede confia somente no environment `production` do
+  `infra-network`;
+- alterações em IAM, backend ou configurações globais exigem revisão de
+  segurança e evidência do plan;
+- access keys permanentes não devem ser usadas no workflow.
+
+## Rollback e troubleshooting
+
+- Para reverter código, reverta o commit e gere um novo plan; não edite o state
+  manualmente.
+- Em falhas OIDC, confira `id-token: write`, `AWS_ROLE_ARN`, `AWS_REGION`, o
+  environment e o subject da trust policy.
+- Em falhas de backend, confira a chave do state, o arquivo `.tflock` e as
+  permissões S3 da role.
+- O bucket possui versionamento; restaure versões somente com backup, análise
+  do impacto e aprovação.
+- O aviso de depreciação do Node 20 não deve ser contornado habilitando runtimes
+  inseguros; atualize as actions para versões suportadas.
+
+## Próximos passos
+
+1. Migrar o pipeline do `infra-network` para a role OIDC publicada.
+2. Criar roles de CI independentes para os demais produtos.
+3. Avaliar KMS gerenciado para o backend.
+4. Adicionar CloudTrail, AWS Config, GuardDuty, budgets e alertas.
 
 ## Ownership
 

@@ -38,9 +38,8 @@ Não pertencem a este repositório:
 
 ## Decisões operacionais
 
-- A primeira implantação usa state local porque o backend e a role de deploy
-  ainda não existem.
-- Depois do primeiro apply, o state deve ser migrado para o bucket S3.
+- A primeira implantação e a adoção dos recursos preexistentes foram concluídas.
+- O state está migrado para o backend S3 compartilhado.
 - O backend usa locking nativo do S3 por arquivo `.tflock`.
 - A chave remota do state deste produto é
   `bootstrap/dev/terraform.tfstate`.
@@ -54,6 +53,7 @@ Não pertencem a este repositório:
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido
   `production`.
+- O deploy OIDC do `infra-bootstrap` foi executado com sucesso.
 - As trust policies OIDC usam subjects imutáveis com IDs de owner e
   repositório.
 
