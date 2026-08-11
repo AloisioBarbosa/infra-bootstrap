@@ -55,6 +55,9 @@ jobs:
       TF_STATE_BUCKET: ${{ vars.TF_STATE_BUCKET }}
       TF_VAR_region: ${{ vars.AWS_REGION }}
       TF_VAR_terraform_state_bucket: ${{ vars.TF_STATE_BUCKET }}
+      TF_VAR_github_owner_id: ${{ vars.GH_OWNER_ID }}
+      TF_VAR_infra_bootstrap_repository_id: ${{ vars.INFRA_BOOTSTRAP_REPOSITORY_ID }}
+      TF_VAR_infra_network_repository_id: ${{ vars.INFRA_NETWORK_REPOSITORY_ID }}
     steps:
       - uses: actions/checkout@v4
 

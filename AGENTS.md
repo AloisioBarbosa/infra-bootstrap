@@ -42,6 +42,8 @@ Não pertencem a este repositório:
   ainda não existem.
 - Depois do primeiro apply, o state deve ser migrado para o bucket S3.
 - O backend usa locking nativo do S3 por arquivo `.tflock`.
+- A chave remota do state deste produto é
+  `bootstrap/dev/terraform.tfstate`.
 - `prevent_destroy` protege o bucket de state.
 - O prefixo SSM autorizado para o `infra-network` é `/infra-network/vpc/*`.
 - A trust policy do `infra-network` usa o subject OIDC imutável do GitHub e
@@ -52,5 +54,7 @@ Não pertencem a este repositório:
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido
   `production`.
+- As trust policies OIDC usam subjects imutáveis com IDs de owner e
+  repositório.
 
 Ao alterar Terraform, atualize este arquivo no mesmo PR.
