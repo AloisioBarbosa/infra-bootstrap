@@ -63,7 +63,9 @@ ou `terraform state mv` nesta transferência de ownership.
 ## Segurança e operação
 
 - O bucket possui `prevent_destroy`; sua remoção exige mudança explícita.
-- A role do `infra-network` confia somente no repositório configurado.
+- A role do `infra-network` confia somente no environment `production` do
+  repositório configurado, usando o subject OIDC imutável com IDs de owner e
+  repositório.
 - Alterações em IAM, backend ou configurações globais exigem revisão de segurança
   e evidência do Terraform plan.
 - `terraform.tfvars` e qualquer state local não devem ser commitados.

@@ -40,6 +40,8 @@ Não pertencem a este repositório:
 - Depois do primeiro apply, o state deve ser migrado para o bucket S3.
 - `prevent_destroy` protege o bucket de state.
 - O prefixo SSM autorizado para o `infra-network` é `/infra-network/vpc/*`.
+- A trust policy do `infra-network` usa o subject OIDC imutável do GitHub e
+  autoriza somente o environment `production`.
 - A role OIDC não altera automaticamente o workflow consumidor; o cutover
   ocorre depois do apply do bootstrap.
 - Nenhum recurso estava implantado na AWS nesta separação, portanto não há
