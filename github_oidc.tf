@@ -75,6 +75,7 @@ data "aws_iam_policy_document" "github_actions_infra_network" {
       "ec2:DescribeVpcs",
       "ec2:DetachInternetGateway",
       "ec2:DisassociateRouteTable",
+      "ec2:DisassociateAddress",
       "ec2:ModifySubnetAttribute",
       "ec2:ModifyVpcAttribute",
       "ec2:ReleaseAddress",
