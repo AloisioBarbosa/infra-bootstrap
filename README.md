@@ -20,7 +20,7 @@ Inclui:
 - provider OIDC do GitHub Actions;
 - role e policy de CI do `infra-bootstrap`;
 - role e policy de CI do `infra-network`;
-- role e policy de CI do `infra-platform`;
+- role e policy de CI do `infra-plataform`;
 - role de CloudWatch Logs e configuração global do API Gateway.
 
 Não inclui VPC, sub-redes, gateways, rotas, endpoints, DNS, Amazon EKS,
@@ -35,7 +35,7 @@ flowchart LR
   B --> IAM["Roles OIDC por produto"]
   B --> APIGW["Logging global API Gateway"]
   IAM --> N["infra-network"]
-  IAM --> P["infra-platform"]
+  IAM --> P["infra-plataform"]
   N -->|"parâmetros SSM"| C["infra-cluster"]
   P -->|"API Kubernetes"| C
 ```
@@ -45,7 +45,7 @@ Outputs publicados:
 - `terraform_state_bucket`;
 - `infra_bootstrap_github_actions_role_arn`;
 - `infra_network_github_actions_role_arn`;
-- `infra_platform_github_actions_role_arn`;
+- `infra_plataform_github_actions_role_arn`;
 - `api_gateway_cloudwatch_role_arn`.
 
 A chave do state deste produto é `bootstrap/dev/terraform.tfstate`. O contrato
@@ -58,12 +58,12 @@ As roles possuem responsabilidades diferentes:
 - `GitHubActionsOIDCInfraNetworkRole` gerencia somente recursos EC2 de rede,
   parâmetros sob `/infra-network/vpc/*` e objetos do state sob `vpc/dev/*`; o
   workflow atual a assume nos environments `plan` e `production`.
-- `GitHubActionsOIDCInfraPlatformRole` descreve somente o cluster
-  `infra-cluster` e gerencia objetos do state sob `platform/dev/*`; o acesso ao
+- `GitHubActionsOIDCInfraPlataformRole` descreve somente o cluster
+  `infra-cluster` e gerencia objetos do state legado sob `platform/dev/*`; o acesso ao
   Kubernetes deve ser publicado pelo `infra-cluster` antes do cutover.
 
 As policies inline são declaradas em `github_oidc.tf` com os nomes
-`TerraformInfraNetworkPolicy` e `TerraformInfraPlatformPolicy`. Ajustes manuais
+`TerraformInfraNetworkPolicy` e `TerraformInfraPlataformPolicy`. Ajustes manuais
 no console devem ser trazidos de volta ao Terraform para evitar drift.
 
 Como evolução de least privilege, o job de plan deve receber uma role separada
@@ -86,7 +86,7 @@ O GitHub Actions exige estas repository variables:
 - `GH_OWNER_ID`;
 - `INFRA_BOOTSTRAP_REPOSITORY_ID`;
 - `INFRA_NETWORK_REPOSITORY_ID`;
-- `INFRA_PLATFORM_REPOSITORY_ID`.
+- `INFRA_PLATAFORM_REPOSITORY_ID`.
 
 O environment `production` faz parte do subject OIDC. Mantenha nele as
 proteções e aprovações exigidas para alterações na conta AWS.

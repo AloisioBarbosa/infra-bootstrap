@@ -134,7 +134,7 @@ resource "aws_iam_role_policy" "github_actions_infra_network" {
   policy = data.aws_iam_policy_document.github_actions_infra_network.json
 }
 
-data "aws_iam_policy_document" "github_actions_infra_platform_trust" {
+data "aws_iam_policy_document" "github_actions_infra_plataform_trust" {
   statement {
     effect  = "Allow"
     actions = ["sts:AssumeRoleWithWebIdentity"]
@@ -154,19 +154,19 @@ data "aws_iam_policy_document" "github_actions_infra_platform_trust" {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
-        "repo:${var.github_organization}@${var.github_owner_id}/infra-platform@${var.infra_platform_repository_id}:environment:plan",
-        "repo:${var.github_organization}@${var.github_owner_id}/infra-platform@${var.infra_platform_repository_id}:environment:production",
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-plataform@${var.infra_plataform_repository_id}:environment:plan",
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-plataform@${var.infra_plataform_repository_id}:environment:production",
       ]
     }
   }
 }
 
-resource "aws_iam_role" "github_actions_infra_platform" {
-  name               = "GitHubActionsOIDCInfraPlatformRole"
-  assume_role_policy = data.aws_iam_policy_document.github_actions_infra_platform_trust.json
+resource "aws_iam_role" "github_actions_infra_plataform" {
+  name               = "GitHubActionsOIDCInfraPlataformRole"
+  assume_role_policy = data.aws_iam_policy_document.github_actions_infra_plataform_trust.json
 }
 
-data "aws_iam_policy_document" "github_actions_infra_platform" {
+data "aws_iam_policy_document" "github_actions_infra_plataform" {
   statement {
     sid     = "DescribePlatformCluster"
     effect  = "Allow"
@@ -195,8 +195,8 @@ data "aws_iam_policy_document" "github_actions_infra_platform" {
   }
 }
 
-resource "aws_iam_role_policy" "github_actions_infra_platform" {
-  name   = "TerraformInfraPlatformPolicy"
-  role   = aws_iam_role.github_actions_infra_platform.id
-  policy = data.aws_iam_policy_document.github_actions_infra_platform.json
+resource "aws_iam_role_policy" "github_actions_infra_plataform" {
+  name   = "TerraformInfraPlataformPolicy"
+  role   = aws_iam_role.github_actions_infra_plataform.id
+  policy = data.aws_iam_policy_document.github_actions_infra_plataform.json
 }

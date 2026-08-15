@@ -18,7 +18,7 @@ Não pertencem a este repositório:
 - VPC, sub-redes, gateways, rotas, endpoints, conectividade ou DNS
   (`infra-network`);
 - EKS e nodes (`infra-cluster`);
-- serviços compartilhados Kubernetes (`infra-platform`).
+- serviços compartilhados Kubernetes (`infra-plataform`).
 
 ## Inventário
 
@@ -54,9 +54,9 @@ Não pertencem a este repositório:
   role no workflow atual.
 - A role OIDC não altera automaticamente o workflow consumidor; o cutover
   ocorre depois do apply do bootstrap.
-- A role do `infra-platform` acessa somente o cluster `infra-cluster`, seu
-  prefixo de state `platform/dev/*` e os environments `plan` e `production`.
-- A autorização Kubernetes da role do `infra-platform` pertence ao
+- A role do `infra-plataform` acessa somente o cluster `infra-cluster`, seu
+  prefixo legado de state `platform/dev/*` e os environments `plan` e `production`.
+- A autorização Kubernetes da role do `infra-plataform` pertence ao
   `infra-cluster` e deve existir antes do cutover do workflow consumidor.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
