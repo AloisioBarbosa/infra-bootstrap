@@ -58,6 +58,9 @@ Não pertencem a este repositório:
   prefixo legado de state `platform/dev/*` e os environments `plan` e `production`.
 - A autorização Kubernetes da role do `infra-plataform` pertence ao
   `infra-cluster` e deve existir antes do cutover do workflow consumidor.
+- O ARN da role do `infra-plataform` é literal na policy de deploy do
+  bootstrap para evitar dependência circular; a criação da role depende
+  explicitamente da atualização de `TerraformInfraBootstrapPolicy`.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido
