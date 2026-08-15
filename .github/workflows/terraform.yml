@@ -58,6 +58,7 @@ jobs:
       TF_VAR_github_owner_id: ${{ vars.GH_OWNER_ID }}
       TF_VAR_infra_bootstrap_repository_id: ${{ vars.INFRA_BOOTSTRAP_REPOSITORY_ID }}
       TF_VAR_infra_network_repository_id: ${{ vars.INFRA_NETWORK_REPOSITORY_ID }}
+      TF_VAR_infra_platform_repository_id: ${{ vars.INFRA_PLATFORM_REPOSITORY_ID }}
     steps:
       - uses: actions/checkout@v4
 

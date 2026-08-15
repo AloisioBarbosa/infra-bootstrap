@@ -30,7 +30,7 @@ Não pertencem a este repositório:
 | `variables.tf` | região, ambiente, bucket e organização GitHub |
 | `data.tf` | identidade AWS e certificado do endpoint OIDC |
 | `terraform_state.tf` | bucket, versionamento, criptografia e bloqueio público |
-| `github_oidc.tf` | provider OIDC e `TerraformInfraNetworkPolicy` da role de rede |
+| `github_oidc.tf` | provider OIDC e policies das roles de rede e plataforma |
 | `github_actions_bootstrap.tf` | role/policy OIDC do pipeline do bootstrap |
 | `api_gateway_account.tf` | logging global do API Gateway na conta |
 | `outputs.tf` | bucket e ARNs publicados |
@@ -54,6 +54,10 @@ Não pertencem a este repositório:
   role no workflow atual.
 - A role OIDC não altera automaticamente o workflow consumidor; o cutover
   ocorre depois do apply do bootstrap.
+- A role do `infra-platform` acessa somente o cluster `infra-cluster`, seu
+  prefixo de state `platform/dev/*` e os environments `plan` e `production`.
+- A autorização Kubernetes da role do `infra-platform` pertence ao
+  `infra-cluster` e deve existir antes do cutover do workflow consumidor.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido
