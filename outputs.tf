@@ -8,6 +8,11 @@ output "infra_network_github_actions_role_arn" {
   value       = aws_iam_role.github_actions_infra_network.arn
 }
 
+output "infra_plataform_github_actions_role_arn" {
+  description = "ARN da role OIDC usada pelo pipeline do infra-plataform."
+  value       = aws_iam_role.github_actions_infra_plataform.arn
+}
+
 output "infra_bootstrap_github_actions_role_arn" {
   description = "ARN da role OIDC usada pelo pipeline do infra-bootstrap."
   value       = aws_iam_role.github_actions_infra_bootstrap.arn

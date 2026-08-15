@@ -133,3 +133,70 @@ resource "aws_iam_role_policy" "github_actions_infra_network" {
   role   = aws_iam_role.github_actions_infra_network.id
   policy = data.aws_iam_policy_document.github_actions_infra_network.json
 }
+
+data "aws_iam_policy_document" "github_actions_infra_plataform_trust" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.github_actions.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+      values = [
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-plataform@${var.infra_plataform_repository_id}:environment:plan",
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-plataform@${var.infra_plataform_repository_id}:environment:production",
+      ]
+    }
+  }
+}
+
+resource "aws_iam_role" "github_actions_infra_plataform" {
+  name               = "GitHubActionsOIDCInfraPlataformRole"
+  assume_role_policy = data.aws_iam_policy_document.github_actions_infra_plataform_trust.json
+}
+
+data "aws_iam_policy_document" "github_actions_infra_plataform" {
+  statement {
+    sid     = "DescribePlatformCluster"
+    effect  = "Allow"
+    actions = ["eks:DescribeCluster"]
+    resources = [
+      "arn:aws:eks:${var.region}:${data.aws_caller_identity.current.account_id}:cluster/infra-cluster",
+    ]
+  }
+
+  statement {
+    sid       = "ListTerraformStateBucket"
+    effect    = "Allow"
+    actions   = ["s3:ListBucket"]
+    resources = [aws_s3_bucket.terraform_state.arn]
+  }
+
+  statement {
+    sid    = "ManageTerraformStateObjects"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject",
+    ]
+    resources = ["${aws_s3_bucket.terraform_state.arn}/platform/dev/*"]
+  }
+}
+
+resource "aws_iam_role_policy" "github_actions_infra_plataform" {
+  name   = "TerraformInfraPlataformPolicy"
+  role   = aws_iam_role.github_actions_infra_plataform.id
+  policy = data.aws_iam_policy_document.github_actions_infra_plataform.json
+}
