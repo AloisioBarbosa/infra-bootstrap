@@ -164,6 +164,8 @@ data "aws_iam_policy_document" "github_actions_infra_plataform_trust" {
 resource "aws_iam_role" "github_actions_infra_plataform" {
   name               = "GitHubActionsOIDCInfraPlataformRole"
   assume_role_policy = data.aws_iam_policy_document.github_actions_infra_plataform_trust.json
+
+  depends_on = [aws_iam_role_policy.github_actions_infra_bootstrap]
 }
 
 data "aws_iam_policy_document" "github_actions_infra_plataform" {
