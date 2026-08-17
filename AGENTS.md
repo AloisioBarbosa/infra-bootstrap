@@ -66,6 +66,9 @@ Não pertencem a este repositório:
   contrato `/infra-network/vpc/*` e os recursos AWS declarados pelo produto.
 - A criação da role do `infra-cluster` depende da atualização da policy do
   bootstrap para evitar falha de autorização no primeiro apply.
+- A criação da service-linked role do EKS Fargate usa permissão dedicada,
+  restrita a `eks-fargate.amazonaws.com`, e depende da atualização da policy
+  do bootstrap.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido
