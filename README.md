@@ -21,6 +21,7 @@ Inclui:
 - role e policy de CI do `infra-bootstrap`;
 - role e policy de CI do `infra-network`;
 - role e policy de CI do `infra-plataform`;
+- role e policy de CI do `infra-cluster`;
 - role de CloudWatch Logs e configuração global do API Gateway.
 
 Não inclui VPC, sub-redes, gateways, rotas, endpoints, DNS, Amazon EKS,
@@ -36,6 +37,7 @@ flowchart LR
   B --> APIGW["Logging global API Gateway"]
   IAM --> N["infra-network"]
   IAM --> P["infra-plataform"]
+  IAM --> C["infra-cluster"]
   N -->|"parâmetros SSM"| C["infra-cluster"]
   P -->|"API Kubernetes"| C
 ```
@@ -46,6 +48,7 @@ Outputs publicados:
 - `infra_bootstrap_github_actions_role_arn`;
 - `infra_network_github_actions_role_arn`;
 - `infra_plataform_github_actions_role_arn`;
+- `infra_cluster_github_actions_role_arn`;
 - `api_gateway_cloudwatch_role_arn`.
 
 A chave do state deste produto é `bootstrap/dev/terraform.tfstate`. O contrato
@@ -86,7 +89,8 @@ O GitHub Actions exige estas repository variables:
 - `GH_OWNER_ID`;
 - `INFRA_BOOTSTRAP_REPOSITORY_ID`;
 - `INFRA_NETWORK_REPOSITORY_ID`;
-- `INFRA_PLATAFORM_REPOSITORY_ID`.
+- `INFRA_PLATAFORM_REPOSITORY_ID`;
+- `INFRA_CLUSTER_REPOSITORY_ID`.
 
 O environment `production` faz parte do subject OIDC. Mantenha nele as
 proteções e aprovações exigidas para alterações na conta AWS.
@@ -131,6 +135,9 @@ plan, backup e aprovação explícita.
 - a role do bootstrap confia somente no environment `production` deste repo;
 - a role de rede confia somente no environment `production` do
   `infra-network`;
+- a role de cluster confia somente no environment `production` do
+  `infra-cluster` e restringe state, contrato SSM e recursos pelo nome
+  `infra-cluster` sempre que a AWS oferece autorização por recurso;
 - alterações em IAM, backend ou configurações globais exigem revisão de
   segurança e evidência do plan;
 - access keys permanentes não devem ser usadas no workflow.
@@ -151,8 +158,7 @@ plan, backup e aprovação explícita.
 ## Próximos passos
 
 1. Migrar o pipeline do `infra-network` para a role OIDC publicada.
-2. Criar roles de CI independentes para `infra-cluster`, `infra-observability`
-   e `infra-apps`.
+2. Migrar o pipeline do `infra-cluster` para a role OIDC publicada.
 3. Avaliar KMS gerenciado para o backend.
 4. Adicionar CloudTrail, AWS Config, GuardDuty, budgets e alertas.
 

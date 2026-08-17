@@ -18,6 +18,11 @@ output "infra_bootstrap_github_actions_role_arn" {
   value       = aws_iam_role.github_actions_infra_bootstrap.arn
 }
 
+output "infra_cluster_github_actions_role_arn" {
+  description = "ARN da role OIDC usada pelo pipeline do infra-cluster."
+  value       = aws_iam_role.github_actions_infra_cluster.arn
+}
+
 output "api_gateway_cloudwatch_role_arn" {
   description = "ARN da role global de logging do API Gateway."
   value       = aws_iam_role.api_gateway_logging.arn

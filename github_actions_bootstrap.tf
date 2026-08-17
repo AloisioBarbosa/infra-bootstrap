@@ -55,6 +55,7 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
       aws_iam_role.api_gateway_logging.arn,
       aws_iam_role.github_actions_infra_bootstrap.arn,
       aws_iam_role.github_actions_infra_network.arn,
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/GitHubActionsOIDCInfraClusterRole",
     ]
   }
 

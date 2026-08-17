@@ -6,12 +6,16 @@ on:
     paths:
       - "**/*.tf"
       - "**/*.tfvars"
+      - "AGENTS.md"
+      - "README.md"
       - ".github/workflows/terraform.yml"
   push:
     branches: [main]
     paths:
       - "**/*.tf"
       - "**/*.tfvars"
+      - "AGENTS.md"
+      - "README.md"
       - ".github/workflows/terraform.yml"
 
 concurrency:
@@ -59,6 +63,7 @@ jobs:
       TF_VAR_infra_bootstrap_repository_id: ${{ vars.INFRA_BOOTSTRAP_REPOSITORY_ID }}
       TF_VAR_infra_network_repository_id: ${{ vars.INFRA_NETWORK_REPOSITORY_ID }}
       TF_VAR_infra_plataform_repository_id: ${{ vars.INFRA_PLATAFORM_REPOSITORY_ID }}
+      TF_VAR_infra_cluster_repository_id: ${{ vars.INFRA_CLUSTER_REPOSITORY_ID }}
     steps:
       - uses: actions/checkout@v4
 

@@ -31,6 +31,7 @@ Não pertencem a este repositório:
 | `data.tf` | identidade AWS e certificado do endpoint OIDC |
 | `terraform_state.tf` | bucket, versionamento, criptografia e bloqueio público |
 | `github_oidc.tf` | provider OIDC e policies das roles de rede e plataforma |
+| `github_actions_cluster.tf` | role/policy OIDC do pipeline do `infra-cluster` |
 | `github_actions_bootstrap.tf` | role/policy OIDC do pipeline do bootstrap |
 | `api_gateway_account.tf` | logging global do API Gateway na conta |
 | `outputs.tf` | bucket e ARNs publicados |
@@ -61,6 +62,10 @@ Não pertencem a este repositório:
 - O ARN da role do `infra-plataform` é literal na policy de deploy do
   bootstrap para evitar dependência circular; a criação da role depende
   explicitamente da atualização de `TerraformInfraBootstrapPolicy`.
+- A role OIDC do `infra-cluster` autoriza o state `cluster/dev/*`, leitura do
+  contrato `/infra-network/vpc/*` e os recursos AWS declarados pelo produto.
+- A criação da role do `infra-cluster` depende da atualização da policy do
+  bootstrap para evitar falha de autorização no primeiro apply.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido

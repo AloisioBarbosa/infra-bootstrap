@@ -77,3 +77,19 @@ variable "infra_bootstrap_repository_id" {
     error_message = "infra_bootstrap_repository_id deve conter apenas dígitos."
   }
 }
+
+variable "infra_cluster_repository_id" {
+  type        = string
+  description = "ID imutável do repositório infra-cluster usado no subject OIDC."
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.infra_cluster_repository_id))
+    error_message = "infra_cluster_repository_id deve conter apenas dígitos."
+  }
+}
+
+variable "infra_cluster_name" {
+  type        = string
+  description = "Nome estável do cluster usado para restringir os recursos gerenciados pela role de CI."
+  default     = "infra-cluster"
+}
