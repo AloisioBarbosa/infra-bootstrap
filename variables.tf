@@ -58,6 +58,16 @@ variable "infra_network_repository_id" {
   }
 }
 
+variable "infra_plataform_repository_id" {
+  type        = string
+  description = "ID imutável do repositório infra-plataform usado no subject OIDC."
+
+  validation {
+    condition     = can(regex("^[0-9]+$", var.infra_plataform_repository_id))
+    error_message = "infra_plataform_repository_id deve conter apenas dígitos."
+  }
+}
+
 variable "infra_bootstrap_repository_id" {
   type        = string
   description = "ID imutável do repositório infra-bootstrap usado no subject OIDC."
