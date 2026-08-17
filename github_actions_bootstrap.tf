@@ -36,6 +36,7 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
     actions = [
       "iam:AttachRolePolicy",
       "iam:CreateRole",
+      "iam:CreateServiceLinkedRole",
       "iam:DeleteRole",
       "iam:DeleteRolePolicy",
       "iam:DetachRolePolicy",
@@ -144,4 +145,8 @@ resource "aws_iam_role_policy" "github_actions_infra_bootstrap" {
   name   = "TerraformInfraBootstrapPolicy"
   role   = aws_iam_role.github_actions_infra_bootstrap.id
   policy = data.aws_iam_policy_document.github_actions_infra_bootstrap.json
+}
+
+resource "aws_iam_service_linked_role" "eks_fargate" {
+  aws_service_name = "eks-fargate.amazonaws.com"
 }
