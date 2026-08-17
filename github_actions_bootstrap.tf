@@ -59,9 +59,9 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
   }
 
   statement {
-    sid       = "CreateEksFargateServiceLinkedRole"
-    effect    = "Allow"
-    actions   = ["iam:CreateServiceLinkedRole"]
+    sid     = "CreateEksFargateServiceLinkedRole"
+    effect  = "Allow"
+    actions = ["iam:CreateServiceLinkedRole"]
     resources = [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks-fargate.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate",
     ]
