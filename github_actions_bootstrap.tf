@@ -36,7 +36,6 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
     actions = [
       "iam:AttachRolePolicy",
       "iam:CreateRole",
-      "iam:CreateServiceLinkedRole",
       "iam:DeleteRole",
       "iam:DeleteRolePolicy",
       "iam:DetachRolePolicy",
@@ -57,6 +56,21 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
       aws_iam_role.github_actions_infra_network.arn,
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/GitHubActionsOIDCInfraClusterRole",
     ]
+  }
+
+  statement {
+    sid       = "CreateEksFargateServiceLinkedRole"
+    effect    = "Allow"
+    actions   = ["iam:CreateServiceLinkedRole"]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks-fargate.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "iam:AWSServiceName"
+      values   = ["eks-fargate.amazonaws.com"]
+    }
   }
 
   statement {
@@ -151,4 +165,8 @@ resource "aws_iam_role_policy" "github_actions_infra_bootstrap" {
 
 resource "aws_iam_service_linked_role" "eks_fargate" {
   aws_service_name = "eks-fargate.amazonaws.com"
-} 
+
+  depends_on = [
+    aws_iam_role_policy.github_actions_infra_bootstrap,
+  ]
+}
