@@ -150,4 +150,4 @@ resource "aws_iam_role_policy" "github_actions_infra_bootstrap" {
 
 resource "aws_iam_service_linked_role" "eks_fargate" {
   aws_service_name = "eks-fargate.amazonaws.com"
-}
+} 
