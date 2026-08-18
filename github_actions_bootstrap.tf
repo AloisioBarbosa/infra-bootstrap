@@ -74,6 +74,28 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
   }
 
   statement {
+    sid    = "ManageEksFargateServiceLinkedRole"
+    effect = "Allow"
+    actions = [
+      "iam:DeleteServiceLinkedRole",
+      "iam:GetRole",
+      "iam:ListRoleTags",
+      "iam:TagRole",
+      "iam:UntagRole",
+    ]
+    resources = [
+      "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks-fargate.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate",
+    ]
+  }
+
+  statement {
+    sid       = "ReadServiceLinkedRoleDeletionStatus"
+    effect    = "Allow"
+    actions   = ["iam:GetServiceLinkedRoleDeletionStatus"]
+    resources = ["*"]
+  }
+
+  statement {
     sid    = "ManageGitHubOIDCProvider"
     effect = "Allow"
     actions = [

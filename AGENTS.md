@@ -71,6 +71,9 @@ Não pertencem a este repositório:
   do bootstrap.
 - A service-linked role preexistente do EKS Fargate é adotada por um bloco de
   import declarativo usando seu ARN, evitando tentativa de recriação.
+- A policy do bootstrap limita leitura, tags e exclusão ao ARN da service-linked
+  role do EKS Fargate; somente a consulta do status assíncrono de exclusão usa
+  `Resource = "*"`, pois a ação não oferece escopo por recurso.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido
