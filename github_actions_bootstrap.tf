@@ -184,16 +184,3 @@ resource "aws_iam_role_policy" "github_actions_infra_bootstrap" {
   role   = aws_iam_role.github_actions_infra_bootstrap.id
   policy = data.aws_iam_policy_document.github_actions_infra_bootstrap.json
 }
-
-resource "aws_iam_service_linked_role" "eks_fargate" {
-  aws_service_name = "eks-fargate.amazonaws.com"
-
-  depends_on = [
-    aws_iam_role_policy.github_actions_infra_bootstrap,
-  ]
-}
-
-import {
-  to = aws_iam_service_linked_role.eks_fargate
-  id = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks-fargate.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate"
-}
