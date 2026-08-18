@@ -63,7 +63,8 @@ Não pertencem a este repositório:
   bootstrap para evitar dependência circular; a criação da role depende
   explicitamente da atualização de `TerraformInfraBootstrapPolicy`.
 - A role OIDC do `infra-cluster` autoriza o state `cluster/dev/*`, leitura do
-  contrato `/infra-network/vpc/*` e os recursos AWS declarados pelo produto.
+  contrato `/infra-network/vpc/*`, os recursos AWS declarados pelo produto e
+  os environments `plan` e `production` na trust policy.
 - A criação da role do `infra-cluster` depende da atualização da policy do
   bootstrap para evitar falha de autorização no primeiro apply.
 - A adoção da service-linked role preexistente do EKS Fargate foi dividida em
