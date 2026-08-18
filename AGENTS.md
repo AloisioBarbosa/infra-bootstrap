@@ -69,6 +69,8 @@ Não pertencem a este repositório:
 - A criação da service-linked role do EKS Fargate usa permissão dedicada,
   restrita a `eks-fargate.amazonaws.com`, e depende da atualização da policy
   do bootstrap.
+- A service-linked role preexistente do EKS Fargate é adotada por um bloco de
+  import declarativo usando seu ARN, evitando tentativa de recriação.
 - Recursos preexistentes foram importados para o state local antes da adoção do
   backend remoto.
 - O deploy automático assume uma role dedicada e exige o environment protegido

@@ -170,3 +170,8 @@ resource "aws_iam_service_linked_role" "eks_fargate" {
     aws_iam_role_policy.github_actions_infra_bootstrap,
   ]
 }
+
+import {
+  to = aws_iam_service_linked_role.eks_fargate
+  id = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks-fargate.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate"
+}
