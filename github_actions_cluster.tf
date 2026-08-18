@@ -18,6 +18,7 @@ data "aws_iam_policy_document" "github_actions_infra_cluster_trust" {
       test     = "StringEquals"
       variable = "token.actions.githubusercontent.com:sub"
       values = [
+        "repo:${var.github_organization}@${var.github_owner_id}/infra-cluster@${var.infra_cluster_repository_id}:environment:plan",
         "repo:${var.github_organization}@${var.github_owner_id}/infra-cluster@${var.infra_cluster_repository_id}:environment:production",
       ]
     }
