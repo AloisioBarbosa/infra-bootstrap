@@ -82,6 +82,7 @@ data "aws_iam_policy_document" "github_actions_infra_bootstrap" {
       "iam:ListRoleTags",
       "iam:TagRole",
       "iam:UntagRole",
+      "iam:UpdateRole",
     ]
     resources = [
       "arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-service-role/eks-fargate.amazonaws.com/AWSServiceRoleForAmazonEKSForFargate",
